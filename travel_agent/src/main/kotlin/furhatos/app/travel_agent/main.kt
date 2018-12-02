@@ -38,18 +38,40 @@ fun main(args: Array<String>) {
     println("Response:")
     println(response.message())
     println(response.body()!!.contentType())
-    // System.out.println(resBody)
     val responseLines = resBody?.lines()
     val schedule = arrayListOf<String>()
-    responseLines?.forEach {
-        line ->
+    responseLines?.forEachIndexed {
+        index, line ->
             println(line)
             if(line.contains("rp-date-header")) {
-                schedule.add(line)
+                val dateLine = line
+                        .substring(line.indexOf(">")+1)
+                        .substring(0, 10)
+                schedule.add(dateLine)
             } else if (line.contains("summary-timeframe")) {
-                schedule.add(line)
+                val timesLine = responseLines[index + 1]
+                val startTime = timesLine
+                        .substring(timesLine.indexOf(";")+1)
+                        .substring(0, 5)
+                val endTime = timesLine
+                        .substring(timesLine.indexOf("&raquo;")+8)
+                        .substring(0, 5)
+                schedule.add(startTime)
+                schedule.add(endTime)
             } else if(line.contains("summary-heading")) {
-                schedule.add(line)
+                if(line.contains("Restid")) {
+                    val travelTimeLine = line
+                            .substring(line.indexOf(">Restid")+8)
+                            .substring(0, 5)
+                    schedule.add(travelTimeLine)
+                }
+                else {
+                    val switchesLine = line
+                            .substring(line.indexOf("heading'>")+9)
+                            .substring(0, 1)
+                    schedule.add(switchesLine)
+                }
+
             }
     }
     println("Schedule:")
