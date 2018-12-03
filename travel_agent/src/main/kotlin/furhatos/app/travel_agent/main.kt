@@ -9,7 +9,14 @@ import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.Request
 import okhttp3.Response
+import java.text.SimpleDateFormat
+import java.time.LocalDate
 import okhttp3.MediaType as OkMediaType
+import java.time.format.DateTimeFormatter
+import org.joda.time.Minutes
+import org.joda.time.DateTime
+
+
 
 
 val client = OkHttpClient()
@@ -30,7 +37,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     var direction1 = ""
     var lineChanges1 = ""
     var directionChanges1 = ""
-    var timeToWalk1 = ""
+    var walkingTime1 = 0
 
     var startTime2 = ""
     var startPoint2 = ""
@@ -40,7 +47,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     var direction2 = ""
     var lineChanges2 = ""
     var directionChanges2 = ""
-    var timeToWalk2 = ""
+    var walkingTime2 = 0
 
     val client = OkHttpClient()
 
@@ -115,10 +122,12 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     println(response.body()!!.contentType())
     val responseLines = resBody?.lines()
     val schedule = arrayListOf<String>()
+    var isWalking = false
+    var gotWalkingStart = false
+    var walkingStart = SimpleDateFormat("HH:mm")
     responseLines?.forEachIndexed {
         index, line ->
         // println(line)
-        var isWalking = false
         if(line.contains("rp-date-header")) {
             val dateLine = line
                     .substring(line.indexOf(">")+1) // 7598
@@ -126,8 +135,8 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
             schedule.add(dateLine)
         } else if (line.contains("summary-timeframe")) {
             val timesLine = responseLines[index + 1]
-            println("Timesline")
-            println(timesLine)
+            //println("Timesline")
+            //println(timesLine)
             var startTime = ""
             var endTime = ""
             if(timesLine.contains(";")) {
@@ -197,16 +206,61 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
             val vehicleLine = responseLines[index + 1]
             if(vehicleLine.contains("Gång")) {
                 isWalking = true
-                println("walking")
+            }
+
+        } else if(line.contains(">ca&nbsp")) {
+            val walkingTimeLine = line
+                    .substring(line.indexOf(">ca&nbsp")+9)
+                    .substring(0, 5)
+            val formatter = SimpleDateFormat("HH:mm")
+            val mFormatter = SimpleDateFormat("mm")
+            if(!gotWalkingStart && isWalking) {
+                walkingStart.applyPattern(walkingTimeLine)
+                gotWalkingStart = true
+            } else if (duration2.equals("") && isWalking) {
+                val walkingStop = SimpleDateFormat("HH:mm")
+                walkingStop.applyPattern(walkingTimeLine)
+                val start = formatter.parse(walkingStart.toLocalizedPattern())
+                val end = formatter.parse(walkingStop.toLocalizedPattern())
+                val walkingTimeDate = Minutes.minutesBetween(DateTime(start), DateTime(end)).getMinutes() % 60
+                println(walkingTimeDate)
+                walkingTime1 += walkingTimeDate
+                isWalking = false
+                gotWalkingStart = false
+                println("Walking time:")
+                println(start)
+                println(end)
+                println(walkingTime1)
+            } else if (isWalking) {
+                val walkingStop = SimpleDateFormat("HH:mm")
+                walkingStop.applyPattern(walkingTimeLine)
+                val start = formatter.parse(walkingStart.toLocalizedPattern())
+                val end = formatter.parse(walkingStop.toLocalizedPattern())
+                val walkingTimeDate = Minutes.minutesBetween(DateTime(start), DateTime(end)).getMinutes() % 60
+                println(walkingTimeDate)
+                walkingTime2 += walkingTimeDate
+                isWalking = false
+                gotWalkingStart = false
+                println("Walking time:")
+                println(start)
+                println(end)
+                println(walkingTime1)
             }
 
         }
     }
     println("Schedule:")
     println(schedule)
-    val finalResponse = "Den förste bussen du kan ta åker klokka $startTime1 från $startPoint1. Ta linje nummer $line1 i riktning $direction1. Den ta $duration1 minutter." +
-            " " +
-            " Ännu en buss åker klokka $startTime2 från $startPoint2. Den er linje nummer $line2 i riktning $direction2 og den ta $duration2 minutter."
+    var walkSnippet1 = ""
+    if (walkingTime1 > 0) {
+        walkSnippet1 = "Du måste åker till fots $walkingTime1 minutter."
+    }
+    var walkSnippet2 = ""
+    if (walkingTime2 > 0) {
+        walkSnippet2 = "Da måste du åker till fots $walkingTime2 minutter."
+    }
+    val finalResponse = "Den förste bussen du kan ta går klokka $startTime1 från $startPoint1. Ta linje nummer $line1 i riktning $direction1. Den ta $duration1 minutter. $walkSnippet1" +
+            " Ännu en buss går klokka $startTime2 från $startPoint2. Den er linje nummer $line2 i riktning $direction2 og den ta $duration2 minutter. $walkSnippet2"
     println(finalResponse)
     return finalResponse
 
