@@ -10,13 +10,20 @@ import furhatos.nlu.common.Yes
 import furhatos.util.Language
 import java.time.LocalTime
 
-
-/*
-    General enquiries that we want to be able to handle as well as an OrderPizzaIntent that is used for initial orders.
- */
 val General: State = state(Interaction) {
     onResponse<RequestJokeIntent> {
-        furhat.say("Did you here about the man who ran in front of the bus? He got tired.")
+        if(GlobalLanguage == Language.ENGLISH_US) {
+            furhat.say("Did you here about the man who ran in front of the bus? He got tired.")
+        }
+        else
+        {
+            furhat.say("Vad gör en sjuk bussförare för att bli frisk?")
+            furhat.gesture(Gestures.BrowRaise)
+            delay(1000)
+            furhat.say("Tar en buss-kur")
+            furhat.gesture(Gestures.BigSmile)
+
+        }
         reentry()
     }
 
@@ -43,6 +50,7 @@ val Start = state(parent = General) {
     onResponse<SvaraJaIntent>{
         furhat.gesture(Gestures.BigSmile)
         goto(CheckOrder)
+        //goto(GetBusTrips)
     }
 
 
@@ -74,33 +82,18 @@ val Start = state(parent = General) {
     }
 }
 
-//val Start : State = state(Interaction) {
-//
-//    onEntry {
-//        furhat.ask("Hi there. Where do you want to go?")
-//    }
-//
-//    onResponse<Yes>{
-//        furhat.say("Thanks, I am looking for the best bus trip for you")
-//    }
-//
-//    onResponse<No>{
-//        furhat.say("No problem, see you")
-//    }
-//}
-
 // Form-filling state that checks any missing slots and if so, goes to specific slot-filling states.
 val CheckOrder = state {
     onEntry {
         val order = users.current.order
         when {
-            order.destination == null -> goto(RequestDestination)
+            order.dest2 == null -> goto(RequestDestination)
             order.timeToLeave == null -> goto(RequestTime)
             else -> {
                 if(GlobalLanguage == Language.ENGLISH_US)
-                    furhat.say("Alright, so you want to go to $order")
+                    furhat.say("Alright, so you want to go to ${order.dest2} at ${order.timeToLeave}")
                 else
-                    furhat.say("Ok, så ni vill åka till $order")
+                    furhat.say("Ok, så ni vill åka till ${order.dest2} kl ${order.timeToLeave}")
                 goto(ConfirmOrder)
             }
         }
@@ -190,7 +183,8 @@ val ConfirmOrder : State = state(parent = OrderHandling) {
             furhat.say("Great")
         else
             furhat.say("Toppen")
-        goto(EndOrder)
+        goto(GetBusTrips)
+        //goto(EndOrder)
     }
 
     onResponse<SvaraJaIntent>{
@@ -199,7 +193,7 @@ val ConfirmOrder : State = state(parent = OrderHandling) {
             furhat.say("Great")
         else
             furhat.say("Toppen")
-        goto(EndOrder)
+        goto(GetBusTrips)
     }
 
     onResponse<No> {
@@ -219,7 +213,7 @@ val ChangeOrder = state(parent = OrderHandling) {
         if(GlobalLanguage == Language.ENGLISH_US)
             furhat.ask("Anything that you like to change?")
         else
-            furhat.ask("Bågot ni vill ändra?")
+            furhat.ask("Något ni vill ändra?")
     }
 
     onReentry {
@@ -246,6 +240,18 @@ val ChangeOrder = state(parent = OrderHandling) {
     }
 }
 
+val GetBusTrips = state {
+    onEntry {
+        furhat.say("Nu söker jag bussar")
+        var bustrip = getSchedule("Universum", "Vasaplan", "2018-12-03", "16:15")
+        furhat.say(bustrip.trip)
+
+        goto(EndOrder)
+
+    }
+
+}
+
 // Order completed
 val EndOrder = state {
     onEntry {
@@ -256,6 +262,7 @@ val EndOrder = state {
         val order = users.current.order
         order.timeToLeave = null
         order.destination = null
+        order.dest2 = null
         goto(Idle)
     }
 }
@@ -316,16 +323,24 @@ val RequestDestination : State = state(parent = OrderHandling) {
             furhat.ask("Vart vill du åka?")
     }
 
-//    onResponse<RequestOptionsIntent> {
-//        transform(it, RequestDeliveryOptionsIntent())
+//    onResponse<TellPlaceIntent3> {
+//        if(GlobalLanguage == Language.ENGLISH_US)
+//            furhat.say("Okay, ${it.intent.place}")
+//        else
+//            furhat.say("Ok, ${it.intent.place}")
+//        users.current.order.destination = it.intent.place
+//        goto(CheckOrder)
 //    }
 
-    onResponse<TellPlaceIntent> {
-        if(GlobalLanguage == Language.ENGLISH_US)
-            furhat.say("Okay, ${it.intent.destination}")
-        else
-            furhat.say("Ok, ${it.intent.destination}")
-        users.current.order.destination = it.intent.destination
+
+    onResponse {
+        var destination = it.speech.text
+        destination = destination.replace("till ", "")
+        furhat.say("Okay, ${destination}")
+        users.current.order.dest2 = destination
         goto(CheckOrder)
+
     }
 }
+
+
