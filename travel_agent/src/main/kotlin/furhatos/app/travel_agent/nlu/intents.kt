@@ -5,10 +5,11 @@ import furhatos.nlu.TextGenerator
 import furhatos.util.Language
 import furhatos.nlu.*
 import furhatos.nlu.common.*
+import java.time.LocalTime
 
 open class OrderBusIntent : Intent(), TextGenerator {
     var destination : Place? = null
-    var timeToLeave : Time? = null
+    var timeToLeave : LocalTime? = null
 
     override fun getExamples(lang: Language): List<String> {
         if(GlobalLanguage == Language.ENGLISH_US) {
@@ -22,7 +23,7 @@ open class OrderBusIntent : Intent(), TextGenerator {
         else
         {
             return listOf(
-                    "Jag vill åka till @destination kl @timeToLeave",
+                    "Jag vill åka till @destination klockan @timeToLeave",
                     "Jag skulle vilja åka till @destination",
                     "Till @destination"
             )
@@ -33,7 +34,7 @@ open class OrderBusIntent : Intent(), TextGenerator {
         if(GlobalLanguage == Language.ENGLISH_US)
             return generate(lang, "[$destination] [at $timeToLeave]")
         else
-            return generate(lang, "[$destination] [kl $timeToLeave]")
+            return generate(lang, "[$destination] [klockan $timeToLeave]")
     }
 
     override fun toString(): String {
@@ -53,9 +54,9 @@ class TellPlaceIntent : Intent() {
 
     override fun getExamples(lang: Language): List<String> {
         if(GlobalLanguage == Language.ENGLISH_US)
-            return listOf("Guitars", "to guitars", "I want to go to guitars")
+            return listOf("Guitars", "to guitars", "I want to go to guitars", "to @destination", "@destination")
         else
-            return listOf("Guitars", "till guitars", "Jag vill åka till guitars")
+            return listOf("Guitars", "till guitars", "Jag vill åka till guitars", "till @destination", "@destination")
     }
 }
 
@@ -73,13 +74,13 @@ class RequestJokeIntent : Intent()  {
     }
 }
 
-class TellTimeIntent(var time : Time? = null) : Intent() {
-
+class TellTimeIntent(var time : Time? = null) : Intent()
+{
     override fun getExamples(lang: Language): List<String> {
         if(GlobalLanguage == Language.ENGLISH_US)
             return listOf("@time", "at @time", "@time o clock")
         else
-            return listOf("@time", "kl @time")
+            return listOf("@time", "klockan @time")
     }
 }
 

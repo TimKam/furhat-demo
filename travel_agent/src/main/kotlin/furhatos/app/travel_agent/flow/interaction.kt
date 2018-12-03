@@ -19,8 +19,6 @@ val General: State = state(Interaction) {
         furhat.say("Did you here about the man who ran in front of the bus? He got tired.")
         reentry()
     }
-
-
 }
 
 // Start of interaction
@@ -219,7 +217,7 @@ val ChangeOrder = state(parent = OrderHandling) {
         if(GlobalLanguage == Language.ENGLISH_US)
             furhat.ask("Anything that you like to change?")
         else
-            furhat.ask("Bågot ni vill ändra?")
+            furhat.ask("Något ni vill ändra?")
     }
 
     onReentry {
@@ -272,26 +270,42 @@ val RequestTime : State = state(parent = OrderHandling) {
 
     onResponse<Number> {
         var hour = it.intent.value
-//
-//        // We're assuming we want an afternoon delivery, so if the user says "at 5", we assume it's 5pm.
-//        if (hour <= 12) hour += 12
-//        transform(it, TellTimeIntent(Time(LocalTime.of(hour, 0))))
+        if (hour != null) {
+            var now = LocalTime.now()
+
+            if (now.hour > hour)
+                hour += 12
+
+            raise(it, TellTimeIntent(Time(LocalTime.of(hour, 0))))
+        }
+        else {
+            propagate()
+        }
+    }
+/*
+    onResponse<Number> {
+        var hour = it.intent.value
+        var time = LocalTime.of(hour, 0)
+
+        /*
         if(GlobalLanguage == Language.ENGLISH_US)
-            furhat.say("Okay, at ${hour}")
+            furhat.say("Okay, at ${time}")
         else
-            furhat.say("Ok, ${hour}")
+            furhat.say("Ok, klockan ${time}")
+        */
 
-
-        users.current.order.timeToLeave = Time(LocalTime.of(hour, 0))
+        users.current.order.timeToLeave = time
         goto(CheckOrder)
     }
-
+*/
     onResponse<TellTimeNowIntent>{
-        var timeNow = Time(LocalTime.now())
+        var timeNow = LocalTime.now()
+        /*
         if(GlobalLanguage == Language.ENGLISH_US)
             furhat.say("Okay, at ${timeNow}")
         else
             furhat.say("Ok, ${timeNow}")
+        */
 
         users.current.order.timeToLeave = timeNow
         goto(CheckOrder)
@@ -299,11 +313,14 @@ val RequestTime : State = state(parent = OrderHandling) {
 
 
     onResponse<TellTimeIntent> {
+        /*
         if(GlobalLanguage == Language.ENGLISH_US)
             furhat.say("Okay, at ${it.intent.time}")
         else
             furhat.say("Ok, ${it.intent.time}")
-        users.current.order.timeToLeave = it.intent.time
+        */
+
+        users.current.order.timeToLeave = it.intent.time?.asLocalTime()
         goto(CheckOrder)
     }
 }

@@ -43,4 +43,19 @@ val Interaction: State = state {
         furhat.glance(it)
     }
 
+    onNoResponse {
+        if (GlobalLanguage == Language.ENGLISH_US)
+            furhat.say("Sorry, I didn't hear you.")
+        else
+            furhat.say("Ursäkta, jag hörde inte.")
+        reentry()
+    }
+
+    onResponse { // Catches everything else
+        if (GlobalLanguage == Language.ENGLISH_US)
+            furhat.say("Sorry, I didn't understand that.")
+        else
+            furhat.say("Ursäkta, jag förstog inte.")
+        reentry()
+    }
 }
