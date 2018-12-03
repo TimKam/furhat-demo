@@ -49,6 +49,8 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     var directionChanges2 = ""
     var walkingTime2 = 0
 
+    var duration3 = ""
+
     val client = OkHttpClient()
 
     val getStartRequest = Request.Builder()
@@ -172,6 +174,8 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
                     duration1 = travelTimeLine
                 } else if (duration2.equals("")) {
                     duration2 = travelTimeLine
+                } else if (duration3.equals("")){
+                    duration3 = travelTimeLine
                 }
             }
             else {
@@ -231,7 +235,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
                 println(start)
                 println(end)
                 println(walkingTime1)
-            } else if (isWalking) {
+            } else if (duration3.equals("") && isWalking) {
                 val walkingStop = SimpleDateFormat("HH:mm")
                 walkingStop.applyPattern(walkingTimeLine)
                 val start = formatter.parse(walkingStart.toLocalizedPattern())
@@ -241,10 +245,10 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
                 walkingTime2 += walkingTimeDate
                 isWalking = false
                 gotWalkingStart = false
-                println("Walking time:")
+                println("Walking time 2:")
                 println(start)
                 println(end)
-                println(walkingTime1)
+                println(walkingTime2)
             }
 
         }
