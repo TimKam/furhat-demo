@@ -92,3 +92,17 @@ class TellTimeNowIntent : Intent() {
             return listOf("Nu", "Genast")
     }
 }
+
+
+
+class SvaraJaIntent : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Ja", "Självklart", "Jajamensan")
+    }
+}
+
+class SvaraNejIntent : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf("Nej", "Inte alls", "Nix")
+    }
+}
