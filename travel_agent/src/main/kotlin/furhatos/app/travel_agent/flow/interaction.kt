@@ -10,6 +10,7 @@ import furhatos.nlu.common.Yes
 import furhatos.util.Language
 import java.time.LocalTime
 
+
 /*
     General enquiries that we want to be able to handle as well as an OrderPizzaIntent that is used for initial orders.
  */
@@ -39,14 +40,28 @@ val Start = state(parent = General) {
         goto(CheckOrder)
     }
 
+    onResponse<SvaraJaIntent>{
+        furhat.gesture(Gestures.BigSmile)
+        goto(CheckOrder)
+    }
+
+
     onResponse<No>{
         furhat.gesture(Gestures.ExpressSad)
         if(GlobalLanguage == Language.ENGLISH_US)
             furhat.say("Okay, have a nice day.")
         else
             furhat.say("Ok, ha en bra dag.")
-
     }
+
+    onResponse<SvaraNejIntent>{
+        furhat.gesture(Gestures.ExpressSad)
+        if(GlobalLanguage == Language.ENGLISH_US)
+            furhat.say("Okay, have a nice day.")
+        else
+            furhat.say("Ok, ha en bra dag.")
+    }
+
 
     onResponse<OrderBusIntent> {
         users.current.order.adjoin(it.intent)
@@ -178,7 +193,20 @@ val ConfirmOrder : State = state(parent = OrderHandling) {
         goto(EndOrder)
     }
 
+    onResponse<SvaraJaIntent>{
+        furhat.gesture(Gestures.BigSmile)
+        if(GlobalLanguage == Language.ENGLISH_US)
+            furhat.say("Great")
+        else
+            furhat.say("Toppen")
+        goto(EndOrder)
+    }
+
     onResponse<No> {
+        goto(ChangeOrder)
+    }
+
+    onResponse<SvaraNejIntent> {
         goto(ChangeOrder)
     }
 }
@@ -205,7 +233,15 @@ val ChangeOrder = state(parent = OrderHandling) {
         reentry()
     }
 
+    onResponse<SvaraJaIntent> {
+        reentry()
+    }
+
     onResponse<No> {
+        goto(EndOrder)
+    }
+
+    onResponse<SvaraNejIntent> {
         goto(EndOrder)
     }
 }
@@ -293,5 +329,3 @@ val RequestDestination : State = state(parent = OrderHandling) {
         goto(CheckOrder)
     }
 }
-
-
