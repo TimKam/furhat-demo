@@ -34,10 +34,13 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
             .build()
 
     val getStartResponseBody = client.newCall(getStartRequest).execute().body()?.string()
+    val startPlaceName = getStartResponseBody!!
+            .substring(0,getStartResponseBody.indexOf("|"))
     val startPlaceId = getStartResponseBody!!
             .substring(getStartResponseBody.indexOf("|")+1)
             .substring(0, 5)
     println("startPlaceId:")
+    println(startPlaceName)
     println(startPlaceId)
 
     val getDestinationRequest = Request.Builder()
@@ -51,19 +54,22 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
             .build()
 
     val getDestinationResponseBody = client.newCall(getDestinationRequest).execute().body()?.string()
+    val destinationName = getDestinationResponseBody!!
+            .substring(0,getDestinationResponseBody!!.indexOf("|"))
     var destinationId = getDestinationResponseBody!!
             .substring(getDestinationResponseBody.indexOf("|")+1)
             .substring(0, 5)
 
     println("destinationId:")
+    println(destinationName)
     println(destinationId)
 
 
     // Example: D6stermalmsgatan, Vasaplan, 2018-12-01, 21%3A16, (second time: 00%3A10)
     val mediaType = OkMediaType.parse("raw")
-    val body = RequestBody.create(mediaType, "inpPointFr_ajax=Ume%E5+%$startPlace%7C$startPlaceId%7C0&inpPointTo_ajax=Ume%E5+$destination%7C$destinationId%7C0&inpPointInterm_ajax=&selRegionFr=741&inpPointFr=&optTypeFr=0&inpPointTo=&optTypeTo=0&inpPointInterm=&selDirection=0&inpTime=$startTime&inpDate=$startDate&optReturn=0&selDirection2=0&inpTime2=$startTime&inpDate2=$startDate&trafficmask=2&selChangeTime=0&selWalkSpeed=0&selPriority=0&cmdAction=search&EU_Spirit=False&TNSource=UMEA&SupportsScript=True&Language=se&VerNo=&Source=querypage_adv&MapParams=")
+    val body = RequestBody.create(mediaType, "selPointFrKey=$startPlaceId&selPointToKey=$destinationId&inpPointFr=$startPlaceName&inpPointFr_ajax=$startPlaceName%7C$startPlaceId%7C0&inpPointTo=$destinationName&inpPointTo_ajax=$destinationName%7C$destinationId%7C0&inpPointInterm_ajax=&selRegionFr=741&optTypeFr=0&optTypeTo=0&inpPointInterm=&selDirection=0&inpTime=$startTime&inpDate=$startDate&optReturn=0&selDirection2=0&inpTime2=$startTime&inpDate2=$startDate&trafficmask=1,2&selChangeTime=0&selWalkSpeed=0&selPriority=0&cmdAction=search&EU_Spirit=False&TNSource=UMEA&SupportsScript=True&Language=se&VerNo=&Source=querypage_adv&MapParams=")
     val request = Request.Builder()
-            .url("https://reseplanerare.fskab.se/umea/v2/querypage_adv.aspx")
+            .url("https://reseplanerare.fskab.se/umea/v2/resultspage.aspx")
             .post(body)
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
@@ -120,7 +126,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
 
 fun main(args: Array<String>) {
     // "https://reseplanerare.fskab.se/umea/v2/rpajax.aspx?net=UMEA&lang=se&letters=address
-    getSchedule("Östermalmsgatan", "Vasaplan", "2018-12-01", "16:15")
+    getSchedule("Universum", "Vasaplan", "2018-12-03", "16:15")
     Skill.main(args)
 
 }
