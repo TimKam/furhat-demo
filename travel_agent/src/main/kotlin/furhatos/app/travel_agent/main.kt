@@ -244,14 +244,12 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
                 walkingTime1 += walkingTimeDate
                 if(!gotFirstWalkingTime1) {
                     gotFirstWalkingTime1 = true
-                    println("#####")
-                    println(walkingTimeDate)
-                    println(startTime1)
-                    firstWalkingTime1 = walkingTimeDate
+                    firstWalkingTime1 += walkingTimeDate
                     val startTime1Format = SimpleDateFormat("HH:mm")
                     startTime1Format.applyPattern(startTime1)
                     val startTime1Temp = formatter.parse(startTime1Format.toLocalizedPattern())
-                    startTime1 = formatter.format(startTime1Temp.time.plus(walkingTimeDateJoda.minutes))
+                    startTime1 = formatter.format(startTime1Temp.time.toLong().plus(walkingTimeDateJoda.getMinutes() * 60 * 1000))
+                    println("startTime1:")
                     println(startTime1)
                 }
                 isWalking = false
@@ -260,8 +258,6 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
                     needsFirstStation = true
                 }
                 println("Walking time:")
-                println(start)
-                println(end)
                 println(walkingTime1)
             } else if (duration3.equals("") && isWalking) {
                 val walkingStop = SimpleDateFormat("HH:mm")
@@ -273,23 +269,18 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
                 println(walkingTimeDate)
                 walkingTime2 += walkingTimeDate
                 if(!gotFirstWalkingTime2) {
-                    println("#####")
-                    println(walkingTimeDateJoda.minutes)
-                    println(startTime2)
                     gotFirstWalkingTime2 = true
                     firstWalkingTime2 += walkingTimeDate
                     val startTime2Format = SimpleDateFormat("HH:mm")
                     startTime2Format.applyPattern(startTime2)
                     val startTime2Temp = formatter.parse(startTime2Format.toLocalizedPattern())
-                    println(startTime2Temp)
-                    startTime2 = formatter.format(startTime2Temp.time.plus(walkingTimeDateJoda.minutes))
+                    startTime2 = formatter.format(startTime2Temp.time.toLong().plus(walkingTimeDateJoda.getMinutes() * 60 * 1000))
+                    println("startTime2:")
                     println(startTime2)
                 }
                 isWalking = false
                 gotWalkingStart = false
                 println("Walking time 2:")
-                println(start)
-                println(end)
                 println(walkingTime2)
             }
 
@@ -314,7 +305,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
 
 fun main(args: Array<String>) {
     // "https://reseplanerare.fskab.se/umea/v2/rpajax.aspx?net=UMEA&lang=se&letters=address
-    //getSchedule("Nydalasjön 2", "Umeå företagspark 12", "2018-12-03", "18:15")
+    getSchedule("Nydalasjön 2", "Umeå företagspark 12", "2018-12-03", "18:15")
     //getSchedule("Universum", "Vasaplan", "2018-12-03", "18:15")
     Skill.main(args)
 }
