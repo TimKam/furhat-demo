@@ -22,10 +22,6 @@ class Travel_agentSkill : Skill() {
     }
 }
 
-class BusSchedule {
-    var trip = "du borde ta bus 8"
-}
-
 fun getSchedule(startPlace: String, destination: String, startDate: String, startTime: String): Array<String> {
 
     var startTime1 = ""
@@ -306,7 +302,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     }
     var walkSnippet2 = ""
     if (walkingTime2 > 0) {
-        walkSnippet2 = "Da måste gå till fots $walkingTime2 minuter."
+        walkSnippet2 = "Da måste du gå till fots $walkingTime2 minuter."
     }
     var changeSnippet1 = ""
     if (numberOfChanges1 !== "") {
@@ -328,5 +324,6 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     val finalLongResponse = "Den första bussen du kan ta går klockan $startTime1 från $startPoint1. Ta linje nummer $line1 i riktning $direction1. Resen tar $duration1 minuter.$changeSnippet1$walkSnippet1" +
             " Ännu en buss går klockan $startTime2 från $startPoint2. Det är linje nummer $line2 i riktning $direction2 och resan tar $duration2 minuter.$changeSnippet2$walkSnippet2"
     println(arrayOf(finalLongResponse, finalShortResponse)[0])
-    return arrayOf(finalLongResponse, finalShortResponse)
+    return arrayOf(finalShortResponse, finalLongResponse)
+
 }
