@@ -62,7 +62,7 @@ val Interaction: State = state {
         if (GlobalLanguage == Language.ENGLISH_US)
             furhat.say("Sorry, I didn't understand that.")
         else
-            furhat.say("Ursäkta, jag förstog inte.")
+            furhat.say("Ursäkta, jag förstod inte.")
         reentry()
     }
 }

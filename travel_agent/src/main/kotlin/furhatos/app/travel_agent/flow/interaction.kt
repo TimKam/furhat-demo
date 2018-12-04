@@ -219,9 +219,10 @@ val ChangeOrder = state(parent = OrderHandling) {
 
     onReentry {
         if(GlobalLanguage == Language.ENGLISH_US)
-            furhat.ask("You would like to go to ${users.current.order}. Anything that you like to change?")
+            furhat.ask("What would you like to change?")
         else
-            furhat.ask("Ni vill åka till ${users.current.order}. Något som ni vill ändra?")
+            furhat.ask("Vad vill ni ändra?")
+            //furhat.ask("Ni vill åka till ${users.current.order}. Något som ni vill ändra?")
     }
 
     onResponse<Yes> {
@@ -239,6 +240,16 @@ val ChangeOrder = state(parent = OrderHandling) {
     onResponse<SvaraNejIntent> {
         goto(EndOrder)
     }
+    onResponse<ChangeDestinationIntent> {
+        goto(RequestDestination)
+    }
+    onResponse<ChangeStartingPlaceIntent> {
+        goto(RequestStart)
+    }
+    onResponse<ChangeTimeToLeaveIntent> {
+        goto(RequestTime)
+    }
+
 }
 
 val GetBusTrips = state {

@@ -114,7 +114,7 @@ class SvaraJaIntent : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return when (lang)
         {
-            Language.SWEDISH -> listOf("Ja", "Självklart", "Jajamensan", "Schp")
+            Language.SWEDISH -> listOf("Ja", "Självklart", "Jajamensan","Jajamen", "Schp")
             Language.GERMAN  -> listOf("Ja")
             else             -> listOf("Yes")
         }
@@ -129,6 +129,39 @@ class SvaraNejIntent : Intent() {
             Language.SWEDISH -> listOf("Nej", "Inte alls", "Nix")
             Language.GERMAN  -> listOf("Nein")
             else             -> listOf("No")
+        }
+    }
+}
+
+class ChangeDestinationIntent : Intent()  {
+    override fun getExamples(lang: Language): List<String> {
+        return when (lang)
+        {
+            Language.SWEDISH -> listOf("Destination", "Destinationen", "Min destination", "Vart jag vill åka", "slutdestination")
+            Language.GERMAN  -> listOf("Zeil")
+            else             -> listOf("Destination", "My destination", "End station")
+        }
+    }
+}
+
+class ChangeTimeToLeaveIntent : Intent()  {
+    override fun getExamples(lang: Language): List<String> {
+        return when (lang)
+        {
+            Language.SWEDISH -> listOf("Avresetid", "tid", "tiden", "starttid")
+            Language.GERMAN  -> listOf("Abfahrt")
+            else             -> listOf("My travel time", "time to travel", "time")
+        }
+    }
+}
+
+class ChangeStartingPlaceIntent : Intent()  {
+    override fun getExamples(lang: Language): List<String> {
+        return when (lang)
+        {
+            Language.SWEDISH -> listOf("Startplats", "startstation", "avrese station")
+            Language.GERMAN  -> listOf("Ausgangspunkt")
+            else             -> listOf("Going from", "Departure station")
         }
     }
 }
