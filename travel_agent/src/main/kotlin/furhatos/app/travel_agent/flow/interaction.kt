@@ -93,12 +93,15 @@ val CheckOrder = state {
             order.timeChecked == false -> goto(ConfirmTime)
             else -> {
                 if(GlobalLanguage == Language.ENGLISH_US)
-                    furhat.say("Alright, so you want to go from ${order.start} to ${order.destination} at ${order.timeToLeave}")
+                    furhat.say("So you want to go from ${order.start} to ${order.destination} at ${order.timeToLeave}")
                 else {
-                    var message = "Ok, så ni vill åka från ${order.start} till ${order.destination}"
+                    var message = "Så ni vill åka från ${order.start} till ${order.destination}"
 
                     if (order.updatedDate) {
-                        message += " den ${order.travelDate.dayOfMonth}:e ${order.travelDate.month}"
+                        if(order.travelDate.dayOfMonth <= 2)
+                            message += " den ${order.travelDate.dayOfMonth}:a ${order.travelDate.month}"
+                        else
+                            message += " den ${order.travelDate.dayOfMonth}:e ${order.travelDate.month}"
                     }
 
                     if (order.updatedDate) {
@@ -483,8 +486,20 @@ val RequestStart : State = state(parent = OrderHandling) {
     }
 
     onResponse {
-        val start = it.speech.text
-        furhat.say("Okay, ${start}")
+        var start = it.speech.text
+        var startSplit: MutableList<String> = mutableListOf<String>()
+        if (GlobalLanguage == Language.ENGLISH_US) {
+            startSplit.addAll(start.split("from".toRegex()))
+            start = startSplit.last()
+            furhat.say("Okay, ${start}")
+        }
+        else
+        {
+            startSplit.addAll(start.split("från".toRegex()))
+            start = startSplit.last()
+            furhat.say("Ok, ${start}")
+        }
+
         users.current.order.setStartPoint(start)
         goto(CheckOrder)
     }
@@ -513,7 +528,7 @@ val RequestDestination : State = state(parent = OrderHandling) {
             furhat.say("Ok, ${destination}")
         }
 
-        users.current.order.destination = destination
+        users.current.order.setDest(destination)
         goto(CheckOrder)
     }
 }

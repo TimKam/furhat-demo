@@ -47,6 +47,11 @@ open class OrderBusIntent : Intent(), TextGenerator {
         this.timeChecked = true
     }
 
+    fun setDest(dest : String)
+    {
+        this.destination = dest
+    }
+
     var busTripResponses : Array<String>? = null
     var busFound : Boolean = false
 
