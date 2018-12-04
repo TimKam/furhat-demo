@@ -5,10 +5,11 @@ import furhatos.app.travel_agent.nlu.*
 import furhatos.gestures.Gestures
 import furhatos.nlu.common.No
 import furhatos.nlu.common.Number
-import furhatos.nlu.common.Time
 import furhatos.nlu.common.Yes
 import furhatos.util.Language
+import java.time.LocalDate
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 val General: State = state(Interaction) {
     onResponse<RequestJokeIntent> {
@@ -85,14 +86,28 @@ val CheckOrder = state {
     onEntry {
         val order = users.current.order
         when {
-            order.start       == null -> goto(RequestStart)
-            order.destination == null -> goto(RequestDestination)
-            order.timeToLeave == null -> goto(RequestTime)
+            order.start       == null  -> goto(RequestStart)
+            order.destination == null  -> goto(RequestDestination)
+            order.timeChecked == false -> goto(ConfirmTime)
             else -> {
                 if(GlobalLanguage == Language.ENGLISH_US)
                     furhat.say("Alright, so you want to go from ${order.start} to ${order.destination} at ${order.timeToLeave}")
-                else
-                    furhat.say("Ok, så ni vill åka från ${order.start} till ${order.destination} klockan ${order.timeToLeave}")
+                else {
+                    var message = "Ok, så ni vill åka från ${order.start} till ${order.destination}"
+
+                    if (order.updatedDate) {
+                        message += " den ${order.travelDate.dayOfMonth}:e ${order.travelDate.month}"
+                    }
+
+                    if (order.updatedDate) {
+                        message += " klockan ${order.timeToLeave.getHour()}"
+                        if (order.timeToLeave.getMinute() > 0)
+                            message += ":${order.timeToLeave.getMinute()}"
+                        message += "."
+                    }
+                    print(message)
+                    furhat.say(message)
+                }
                 goto(ConfirmOrder)
             }
         }
@@ -168,6 +183,40 @@ val OrderHandling: State = state(parent = General) {
     }
 }
 
+val ConfirmTime : State = state(parent = OrderHandling)
+{
+    onEntry {
+        if (GlobalLanguage == Language.ENGLISH_US)
+            furhat.ask("I assume that you would like to travel now?")
+        else
+            furhat.ask("Vill du åka nu?")
+    }
+
+    onResponse<SvaraJaIntent> {
+        users.current.order.setTimeChecked()
+        goto(CheckOrder)
+    }
+
+    onResponse<SvaraNejIntent> {
+        goto(RequestTime)
+    }
+
+    onResponse<TellTimeNowIntent> {
+        users.current.order.setTime(LocalTime.now())
+        goto(CheckOrder)
+    }
+
+    onResponse<TellTimeIntent> {
+        users.current.order.setTime(it.intent.time?.asLocalTime() ?: LocalTime.now())
+        goto(CheckOrder)
+    }
+
+    onResponse<TellDateIntent> {
+        users.current.order.setDate(it.intent.date?.asLocalDate() ?: LocalDate.now())
+        goto(CheckOrder)
+    }
+}
+
 // Confirming order
 val ConfirmOrder : State = state(parent = OrderHandling) {
     onEntry {
@@ -183,7 +232,6 @@ val ConfirmOrder : State = state(parent = OrderHandling) {
         else
             furhat.say("Toppen")
         goto(GetBusTrips)
-        //goto(EndOrder)
     }
 
     onResponse<SvaraJaIntent>{
@@ -239,11 +287,16 @@ val ChangeOrder = state(parent = OrderHandling) {
     }
 }
 
-val GetBusTrips = state {
+val GetBusTrips = state(parent = OrderHandling) {
     onEntry {
         furhat.say("Nu söker jag bussar")
-        var bustrip = getSchedule("Universum", "Vasaplan", "2018-12-03", "16:15")
-        furhat.say(bustrip)
+        val destination = users.current.order.destination ?: "Vasaplan"
+        val (short, long) = getSchedule( users.current.order.start ?: "Universum"
+                                       , destination
+                                       , users.current.order.travelDate.format(DateTimeFormatter.ISO_DATE).toString()
+                                       , users.current.order.timeToLeave.format(DateTimeFormatter.ofPattern("HH:mm")).toString()
+                                       )
+        furhat.say(short)
         goto(EndOrder)
     }
 }
@@ -255,9 +308,6 @@ val EndOrder = state {
             furhat.say("Have a nice trip")
         else
             furhat.say("Ha en trevlig resa")
-        val order = users.current.order
-        order.timeToLeave = null
-        order.destination = null
         goto(Idle)
     }
 }
@@ -267,64 +317,31 @@ val EndOrder = state {
 val RequestTime : State = state(parent = OrderHandling) {
     onEntry() {
         if(GlobalLanguage == Language.ENGLISH_US)
-            furhat.ask("At what time do you want to go?")
+            furhat.ask("When do you want to go?")
         else
-            furhat.ask("Vilken tid vill ni åka?")
+            furhat.ask("När vill ni åka?")
     }
-/*
-    onResponse<Number> {
-        var hour = it.intent.value
-        if (hour != null) {
-            var now = LocalTime.now()
 
-            if (now.hour > hour)
-                hour += 12
-
-            raise(it, TellTimeIntent(Time(LocalTime.of(hour, 0))))
-        }
-        else {
-            propagate()
-        }
-    }
-*/
     onResponse<Number> {
         val hour = it.intent.value
-        val time = LocalTime.of(hour, 0)
-
-        /*
-        if(GlobalLanguage == Language.ENGLISH_US)
-            furhat.say("Okay, at ${time}")
-        else
-            furhat.say("Ok, klockan ${time}")
-        */
-
-        users.current.order.timeToLeave = time
+        users.current.order.setTime(LocalTime.of(hour, 0))
         goto(CheckOrder)
     }
 
     onResponse<TellTimeNowIntent>{
-        val timeNow = LocalTime.now()
-        /*
-        if(GlobalLanguage == Language.ENGLISH_US)
-            furhat.say("Okay, at ${timeNow}")
-        else
-            furhat.say("Ok, ${timeNow}")
-        */
-
-        users.current.order.timeToLeave = timeNow
+        users.current.order.setTime(LocalTime.now())
         goto(CheckOrder)
     }
 
 
     onResponse<TellTimeIntent> {
-        /*
-        if(GlobalLanguage == Language.ENGLISH_US)
-            furhat.say("Okay, at ${it.intent.time}")
-        else
-            furhat.say("Ok, ${it.intent.time}")
-        */
+        users.current.order.setTime(it.intent.time?.asLocalTime() ?: LocalTime.now())
+        goto(CheckOrder)
+    }
 
-        users.current.order.timeToLeave = it.intent.time?.asLocalTime()
+    onResponse<TellDateAndTimeIntent> {
+        users.current.order.setDate(it.intent.date?.asLocalDate() ?: LocalDate.now())
+        users.current.order.setTime(it.intent.time?.asLocalTime() ?: LocalTime.now())
         goto(CheckOrder)
     }
 }
@@ -339,9 +356,9 @@ val RequestStart : State = state(parent = OrderHandling) {
     }
 
     onResponse {
-        var start = it.speech.text
+        val start = it.speech.text
         furhat.say("Okay, ${start}")
-        users.current.order.start = start
+        users.current.order.setStartPoint(start)
         goto(CheckOrder)
     }
 }

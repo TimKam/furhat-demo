@@ -330,7 +330,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
 
 fun main(args: Array<String>) {
     // "https://reseplanerare.fskab.se/umea/v2/rpajax.aspx?net=UMEA&lang=se&letters=address
-    getSchedule("Nydalasjön 2", "Umeå företagspark 12", "2018-12-03", "18:15")
+    //getSchedule("Nydalasjön 2", "Umeå företagspark 12", "2018-12-03", "18:15")
     //getSchedule("Universum", "Vasaplan", "2018-12-03", "18:15")
     Skill.main(args)
 }
