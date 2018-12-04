@@ -12,7 +12,7 @@ val Idle: State = state {
             //Clear
             var order = users.current.order
             furhat.attend(users.random)
-            order.timeToLeave = null
+            //order.timeToLeave = null // what are we clearing here?
             order.destination = null
             order.start = null
             order.busTripResponses = null

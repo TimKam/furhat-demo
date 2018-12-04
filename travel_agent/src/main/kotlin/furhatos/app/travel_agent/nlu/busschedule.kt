@@ -29,7 +29,6 @@ enum class BusAnswer(val index: Int) {
 }
 
 fun getSchedule(startPlace: String, destination: String, startDate: String, startTime: String): Array<String> {
-
     var startTime1 = ""
     var startPoint1 = ""
     var endTime1 = ""
@@ -321,15 +320,16 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     var changeSnippet2 = ""
     if (numberOfChanges2 !== "" && numberOfChanges2.compareTo("0")!=0) {
         if (numberOfChanges2 == "1") {
-            changeSnippet2 = " Du måste byta buss $numberOfChanges2 gång. "
+            changeSnippet2 = " Du måste byter buss $numberOfChanges2 gang. "
         } else {
-            changeSnippet2 = " Du måste byta buss $numberOfChanges2 gånger. "
+            changeSnippet2 = " Du måste byter buss $numberOfChanges2 ganger. "
         }
     }
+
     val finalShortResponse = "Den första bussen du kan ta går klockan $startTime1 från $startPoint1."
     val finalLongResponse = "Bussen går klockan $startTime1 från $startPoint1. Ta linje nummer $line1 i riktning $direction1. Resan tar $duration1 minuter.$changeSnippet1$walkSnippet1" +
             " Ännu en buss går klockan $startTime2 från $startPoint2. Det är linje nummer $line2 i riktning $direction2 och resan tar $duration2 minuter.$changeSnippet2$walkSnippet2"
-    println(arrayOf(finalLongResponse, finalShortResponse)[0])
-    return arrayOf(finalShortResponse, finalLongResponse)
 
+    println(arrayOf(finalLongResponse, finalShortResponse)[0])
+    return arrayOf(finalLongResponse, finalShortResponse)
 }
