@@ -22,6 +22,12 @@ class Travel_agentSkill : Skill() {
     }
 }
 
+
+enum class BusAnswer(val index: Int) {
+    SHORT(0),
+    LONG(1)
+}
+
 fun getSchedule(startPlace: String, destination: String, startDate: String, startTime: String): Array<String> {
 
     var startTime1 = ""
@@ -298,14 +304,14 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     println(schedule)
     var walkSnippet1 = ""
     if (walkingTime1 > 0) {
-        walkSnippet1 = "Du måste gå till fots $walkingTime1 minuter."
+        walkSnippet1 = "Du måste gå till fots i $walkingTime1 minuter."
     }
     var walkSnippet2 = ""
     if (walkingTime2 > 0) {
-        walkSnippet2 = "Da måste du gå till fots $walkingTime2 minuter."
+        walkSnippet2 = "Da måste du gå till fots i $walkingTime2 minuter."
     }
     var changeSnippet1 = ""
-    if (numberOfChanges1 !== "") {
+    if (numberOfChanges1 !== "" && numberOfChanges1.compareTo("0")!=0) {
         if (numberOfChanges1 == "1") {
             changeSnippet1 = " Du måste byta buss $numberOfChanges1 gång. "
         } else {
@@ -313,7 +319,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
         }
     }
     var changeSnippet2 = ""
-    if (numberOfChanges2 !== "") {
+    if (numberOfChanges2 !== "" && numberOfChanges2.compareTo("0")!=0) {
         if (numberOfChanges2 == "1") {
             changeSnippet2 = " Du måste byta buss $numberOfChanges2 gång. "
         } else {
@@ -321,7 +327,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
         }
     }
     val finalShortResponse = "Den första bussen du kan ta går klockan $startTime1 från $startPoint1."
-    val finalLongResponse = "Den första bussen du kan ta går klockan $startTime1 från $startPoint1. Ta linje nummer $line1 i riktning $direction1. Resen tar $duration1 minuter.$changeSnippet1$walkSnippet1" +
+    val finalLongResponse = "Bussen går klockan $startTime1 från $startPoint1. Ta linje nummer $line1 i riktning $direction1. Resan tar $duration1 minuter.$changeSnippet1$walkSnippet1" +
             " Ännu en buss går klockan $startTime2 från $startPoint2. Det är linje nummer $line2 i riktning $direction2 och resan tar $duration2 minuter.$changeSnippet2$walkSnippet2"
     println(arrayOf(finalLongResponse, finalShortResponse)[0])
     return arrayOf(finalShortResponse, finalLongResponse)

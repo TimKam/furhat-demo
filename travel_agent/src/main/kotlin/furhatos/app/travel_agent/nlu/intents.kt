@@ -12,7 +12,16 @@ open class OrderBusIntent : Intent(), TextGenerator {
     var destination : String? = null
     var timeToLeave : LocalTime? = null
     var busTripResponses : Array<String>? = null
-    var chosenBustripIndex : Int = 0
+    var busFound : Boolean = false
+
+    fun initBusOrder()
+    {
+        start = null
+        timeToLeave = null
+        destination = null
+        busTripResponses = null
+        busFound = false
+    }
 
     override fun getExamples(lang: Language): List<String> {
         return when (lang)
