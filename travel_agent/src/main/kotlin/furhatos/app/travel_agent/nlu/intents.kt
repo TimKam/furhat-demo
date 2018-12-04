@@ -48,7 +48,18 @@ open class OrderBusIntent : Intent(), TextGenerator {
     }
 
     var busTripResponses : Array<String>? = null
-    var chosenBustripIndex : Int = 0
+    var busFound : Boolean = false
+
+    /* I don't think we need this, every new user gets a new OrderBusIntent anyway
+    fun initBusOrder()
+    {
+        start = null
+        timeToLeave = null
+        destination = null
+        busTripResponses = null
+        busFound = false
+    }
+    */
 
     override fun getExamples(lang: Language): List<String> {
         return when (lang)

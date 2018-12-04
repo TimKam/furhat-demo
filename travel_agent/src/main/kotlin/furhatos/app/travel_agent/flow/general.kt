@@ -9,7 +9,14 @@ val Idle: State = state {
         furhat.setVoice(GlobalLanguage, Gender.MALE)
         println("changing language")
         if (users.count > 0) {
+            //Clear
+            var order = users.current.order
             furhat.attend(users.random)
+            //order.timeToLeave = null // what are we clearing here?
+            order.destination = null
+            order.start = null
+            order.busTripResponses = null
+            order.busFound = false
             goto(Start)
         }
     }
