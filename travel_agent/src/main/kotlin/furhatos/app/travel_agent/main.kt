@@ -324,7 +324,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     val finalLongResponse = "Den förste bussen du kan ta går klokka $startTime1 från $startPoint1. Ta linje nummer $line1 i riktning $direction1. Resen tar $duration1 minutter.$changeSnippet1$walkSnippet1" +
             " Ännu en buss går klokka $startTime2 från $startPoint2. Den er linje nummer $line2 i riktning $direction2 og resen tar $duration2 minutter.$changeSnippet2$walkSnippet2"
     println(arrayOf(finalLongResponse, finalShortResponse)[0])
-    return arrayOf(finalLongResponse, finalShortResponse)
+    return arrayOf(finalShortResponse, finalLongResponse)
 
 }
 
