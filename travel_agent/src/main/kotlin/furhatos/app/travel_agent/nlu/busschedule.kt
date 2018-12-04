@@ -303,11 +303,17 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     println(schedule)
     var walkSnippet1 = ""
     if (walkingTime1 > 0) {
-        walkSnippet1 = "Du måste gå till fots i $walkingTime1 minuter."
+        if(walkingTime1 == 1)
+            walkSnippet1 = "Du måste gå till fots i $walkingTime1 minut."
+        else
+            walkSnippet1 = "Du måste gå till fots i $walkingTime1 minuter."
     }
     var walkSnippet2 = ""
     if (walkingTime2 > 0) {
-        walkSnippet2 = "Da måste du gå till fots i $walkingTime2 minuter."
+        if(walkingTime2 == 1)
+            walkSnippet2 = "Du måste gå till fots i $walkingTime2 minut."
+        else
+            walkSnippet2 = "Du måste gå till fots i $walkingTime2 minuter."
     }
     var changeSnippet1 = ""
     if (numberOfChanges1 !== "" && numberOfChanges1.compareTo("0")!=0) {
@@ -326,10 +332,14 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
         }
     }
 
+    //Remove hours from duration
+    duration1 = duration1.substring(duration1.length-2)
+    duration2 = duration2.substring(duration2.length-2)
+
     val finalShortResponse = "Den första bussen du kan ta går klockan $startTime1 från $startPoint1."
     val finalLongResponse = "Bussen går klockan $startTime1 från $startPoint1. Ta linje nummer $line1 i riktning $direction1. Resan tar $duration1 minuter.$changeSnippet1$walkSnippet1" +
             " Ännu en buss går klockan $startTime2 från $startPoint2. Det är linje nummer $line2 i riktning $direction2 och resan tar $duration2 minuter.$changeSnippet2$walkSnippet2"
 
-    println(arrayOf(finalLongResponse, finalShortResponse)[0])
-    return arrayOf(finalLongResponse, finalShortResponse)
+    println(arrayOf(finalShortResponse, finalLongResponse)[0])
+    return arrayOf(finalShortResponse, finalLongResponse)
 }

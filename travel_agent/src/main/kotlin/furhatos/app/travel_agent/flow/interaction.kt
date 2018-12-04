@@ -194,7 +194,7 @@ val ConfirmTime : State = state(parent = OrderHandling)
         if (GlobalLanguage == Language.ENGLISH_US)
             furhat.ask("I assume that you would like to travel now?")
         else
-            furhat.ask("Vill du åka nu?")
+            furhat.ask("Vill du åka nu direkt?")
     }
 
     onResponse<SvaraJaIntent> {
