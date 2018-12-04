@@ -297,18 +297,18 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     println(schedule)
     var walkSnippet1 = ""
     if (walkingTime1 > 0) {
-        walkSnippet1 = "Du måste åker till fots $walkingTime1 minutter."
+        walkSnippet1 = "Du måste gå till fots $walkingTime1 minuter."
     }
     var walkSnippet2 = ""
     if (walkingTime2 > 0) {
-        walkSnippet2 = "Da måste du åker till fots $walkingTime2 minutter."
+        walkSnippet2 = "Da måste du gå till fots $walkingTime2 minuter."
     }
     var changeSnippet1 = ""
     if (numberOfChanges1 !== "") {
         if (numberOfChanges1 == "1") {
-            changeSnippet1 = " Du måste byter buss $numberOfChanges1 gang. "
+            changeSnippet1 = " Du måste byta buss $numberOfChanges1 gång. "
         } else {
-            changeSnippet1 = " Du måste byter buss $numberOfChanges1 ganger. "
+            changeSnippet1 = " Du måste byta buss $numberOfChanges1 gånger. "
         }
     }
     var changeSnippet2 = ""

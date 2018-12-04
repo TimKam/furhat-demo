@@ -47,24 +47,27 @@ open class OrderBusIntent : Intent(), TextGenerator {
         this.timeChecked = true
     }
 
+    var busTripResponses : Array<String>? = null
+    var chosenBustripIndex : Int = 0
+
     override fun getExamples(lang: Language): List<String> {
         return when (lang)
         {
             Language.SWEDISH -> listOf("Jag vill åka till @destination klockan @timeToLeave",
-                                       "Jag vill åka till @destination",
-                                       "Jag skulle vilja åka till @destination",
-                                       "Till @destination")
+                    "Jag vill åka till @destination",
+                    "Jag skulle vilja åka till @destination",
+                    "Till @destination")
             Language.GERMAN  -> listOf("Ich will um @timeToLeave nach @destination fahren"
-                                      , "Ich will um @timeToLeave zu @destination fahren"
-                                      , "Ich will nach @destination fahren"
-                                      , "Ich will zu @destination fahren"
-                                      , "Zu @destination"
-                                      , "Nach @destination"
-                                      )
+                    , "Ich will um @timeToLeave zu @destination fahren"
+                    , "Ich will nach @destination fahren"
+                    , "Ich will zu @destination fahren"
+                    , "Zu @destination"
+                    , "Nach @destination"
+            )
             else             -> listOf("I would like to go to @destination at @timeToLeave",
-                                       "I would like to go to @destination",
-                                       "To @destination",
-                                       "At @timeToLeave")
+                    "I would like to go to @destination",
+                    "To @destination",
+                    "At @timeToLeave")
         }
     }
 
