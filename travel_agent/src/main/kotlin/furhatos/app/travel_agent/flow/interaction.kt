@@ -1,4 +1,6 @@
 package furhatos.app.travel_agent.flow
+
+
 import furhatos.flow.kotlin.*
 import furhatos.app.travel_agent.nlu.*
 
@@ -142,7 +144,7 @@ val OrderHandling: State = state(parent = General) {
                         message += ", åker till ${it.intent.destination} "
                         if (order.destination != null) message += "istället " // Add an "instead" if we are overwriting the slot
                     }
-                                        }
+                }
                 it.intent.timeToLeave != null -> { // We get only a delivery time
                     if(GlobalLanguage == Language.ENGLISH_US) {
                         message += ", leaving at ${it.intent.timeToLeave} "
@@ -241,10 +243,115 @@ val ChangeOrder = state(parent = OrderHandling) {
 
 val GetBusTrips = state {
     onEntry {
-        furhat.say("Nu söker jag bussar")
-        var bustrip = getSchedule("Universum", "Vasaplan", "2018-12-03", "16:15")
-        furhat.say(bustrip)
+        var order = users.current.order
+        if(GlobalLanguage == Language.ENGLISH_US)
+            furhat.say("I am now searching busses for you")
+        else
+            furhat.say("Nu söker jag bussar")
+        order.busTripResponses = getSchedule("Universum", "Vasaplan", "2018-12-04", "16:15")
+        order.chosenBustripIndex = 0  //check the first bustrip first
+        goto(ChooseBusTrip)
+    }
+}
+
+val ChooseBusTrip = state {
+    onEntry {
+        var order = users.current.order
+        if(order.busTripResponses == null)
+        {
+            furhat.gesture(Gestures.ExpressSad)
+            if(GlobalLanguage == Language.ENGLISH_US)
+                furhat.ask("I could not find any matching bustrips for you")
+            else
+                furhat.say("Jag hittade inga bussar åt dig")
+            goto(SearchAgain)
+        }
+        else {
+            if (GlobalLanguage == Language.ENGLISH_US) {
+                furhat.ask("I found the following bustrip")
+            }
+            else {
+                furhat.say("Jag hittade följande buss")
+            }
+
+            furhat.say(order.busTripResponses!![order.chosenBustripIndex])
+
+            if (GlobalLanguage == Language.ENGLISH_US) {
+                furhat.ask("Is it ok?")
+            }
+            else {
+                furhat.say("Är det en lämplig buss?")
+            }
+        }
+    }
+
+    onResponse<Yes> {
         goto(EndOrder)
+    }
+
+    onResponse<SvaraJaIntent> {
+        goto(EndOrder)
+    }
+
+    onResponse<No> {
+        /*
+        var order = users.current.order
+
+        if(order.busTripResponses!!.count() > order.chosenBustripIndex + 1)
+        {
+            furhat.say("Jag hittade även fler bussar, vill du höra om dem?")
+        }
+        reentry()
+        */
+        goto(ChangeOrder)
+    }
+
+    onResponse<SvaraNejIntent> {
+        goto(ChangeOrder)
+    }
+}
+
+// Changing order
+val SearchAgain = state(parent = OrderHandling) {
+    onEntry {
+        if(GlobalLanguage == Language.ENGLISH_US)
+            furhat.ask("Do you want to change your search?")
+        else
+            furhat.ask("Vill ni ändra er sökning?")
+    }
+
+    onResponse<Yes> {
+        goto(ChangeOrder)
+    }
+
+    onResponse<SvaraJaIntent> {
+        goto(ChangeOrder)
+    }
+
+    onResponse<No> {
+        goto(AbortOrder)
+    }
+
+    onResponse<SvaraNejIntent> {
+        goto(AbortOrder)
+    }
+}
+
+// Order completed
+val AbortOrder = state {
+    onEntry {
+        furhat.gesture(Gestures.ExpressSad)
+        if(GlobalLanguage == Language.ENGLISH_US)
+            furhat.say("Sad that I could not help you")
+        else
+            furhat.say("Tråkigt att jag inte kunna hjälpa er")
+        val order = users.current.order
+        order.timeToLeave = null
+        order.destination = null
+        order.busTripResponses = null
+        order.timeToLeave = null
+
+        goto(Idle)
     }
 }
 
@@ -335,7 +442,7 @@ val RequestStart : State = state(parent = OrderHandling) {
         if(GlobalLanguage == Language.ENGLISH_US)
             furhat.ask("From where would you like to travel?")
         else
-            furhat.ask("Var vill du åka ifrån?")
+            furhat.ask("Vart vill du åka från?")
     }
 
     onResponse {
@@ -349,7 +456,7 @@ val RequestStart : State = state(parent = OrderHandling) {
 // Request destination
 val RequestDestination : State = state(parent = OrderHandling) {
     onEntry() {
-        if(GlobalLanguage == Language.ENGLISH_US)
+        if (GlobalLanguage == Language.ENGLISH_US)
             furhat.ask("Where do you want to go?")
         else
             furhat.ask("Vart vill du åka?")
@@ -357,7 +464,18 @@ val RequestDestination : State = state(parent = OrderHandling) {
 
     onResponse {
         var destination = it.speech.text
-        furhat.say("Okay, ${destination}")
+        var destSplit: MutableList<String> = mutableListOf<String>()
+        if (GlobalLanguage == Language.ENGLISH_US) {
+            destSplit.addAll(destination.split("to".toRegex()))
+            destination = destSplit.last()
+            furhat.say("Okay, ${destination}")
+        }
+        else {
+            destSplit.addAll(destination.split("till".toRegex()))
+            destination = destSplit.last()
+            furhat.say("Ok, ${destination}")
+        }
+
         users.current.order.destination = destination
         goto(CheckOrder)
     }
