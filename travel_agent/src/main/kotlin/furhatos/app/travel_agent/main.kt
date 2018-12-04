@@ -29,6 +29,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     var duration1 = ""
     var line1 = ""
     var direction1 = ""
+    var numberOfChanges1 = ""
     var changeStops1 = ""
     var lineChanges1 = ""
     var directionChanges1 = ""
@@ -40,6 +41,7 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     var duration2 = ""
     var line2 = ""
     var direction2 = ""
+    var numberOfChanges2 = ""
     var changeStops2 = ""
     var lineChanges2 = ""
     var directionChanges2 = ""
@@ -195,6 +197,11 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
                         .substring(line.indexOf("heading'>")+9)
                         .substring(0, 1)
                 schedule.add(switchesLine)
+                if(duration2.equals("")) {
+                    numberOfChanges1 = switchesLine
+                } else if(duration3.equals("")) {
+                    numberOfChanges2 = switchesLine
+                }
             }
 
         } else if(line.contains("MqueryLine")) {
@@ -296,8 +303,24 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
     if (walkingTime2 > 0) {
         walkSnippet2 = "Da måste du åker till fots $walkingTime2 minutter."
     }
-    val finalResponse = "Den förste bussen du kan ta går klokka $startTime1 från $startPoint1. Ta linje nummer $line1 i riktning $direction1. Resen tar $duration1 minutter. $walkSnippet1" +
-            " Ännu en buss går klokka $startTime2 från $startPoint2. Den er linje nummer $line2 i riktning $direction2 og resen tar $duration2 minutter. $walkSnippet2"
+    var changeSnippet1 = ""
+    if (numberOfChanges1 !== "") {
+        if (numberOfChanges1 == "1") {
+            changeSnippet1 = " Du måste byter buss $numberOfChanges1 gang. "
+        } else {
+            changeSnippet1 = " Du måste byter buss $numberOfChanges1 ganger. "
+        }
+    }
+    var changeSnippet2 = ""
+    if (numberOfChanges2 !== "") {
+        if (numberOfChanges2 == "1") {
+            changeSnippet2 = " Du måste byter buss $numberOfChanges2 gang. "
+        } else {
+            changeSnippet2 = " Du måste byter buss $numberOfChanges2 ganger. "
+        }
+    }
+    val finalResponse = "Den förste bussen du kan ta går klokka $startTime1 från $startPoint1. Ta linje nummer $line1 i riktning $direction1. Resen tar $duration1 minutter.$changeSnippet1$walkSnippet1" +
+            " Ännu en buss går klokka $startTime2 från $startPoint2. Den er linje nummer $line2 i riktning $direction2 og resen tar $duration2 minutter.$changeSnippet2$walkSnippet2"
     println(finalResponse)
     return finalResponse
 
