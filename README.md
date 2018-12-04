@@ -10,7 +10,10 @@ Note that we ``Gen2 Legacy`` version of the Furhat SDK to be compatible with the
 **Note:** If you are reading this "offline", you find the code at https://github.com/TimKam/furhat-demo.
 
 ## Interacting with the Furhat travel planner
-<!--The following video shows how you can interact with the Furhat travel planner --!>
+The following video shows how you can interact with the Furhat travel planner:
+
+**TODO**
+
 
 ## Future work
 So far, we have implemented a simple demo to show-case some capabilities of Furhat.
