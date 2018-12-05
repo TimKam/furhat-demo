@@ -17,6 +17,6 @@ class Travel_agentSkill : Skill() {
 fun main(args: Array<String>) {
     // "https://reseplanerare.fskab.se/umea/v2/rpajax.aspx?net=UMEA&lang=se&letters=address
     //getSchedule("Nydalasjön 2", "Umeå företagspark 12", "2018-12-03", "18:15")
-    //getSchedule("Universum", "Vasaplan", "2018-12-03", "18:15")
+    //getSchedule("Airport", "Hoppets Gränd 30A", "2018-12-05", "18:00")
     Skill.main(args)
 }
