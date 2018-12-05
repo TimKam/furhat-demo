@@ -320,17 +320,16 @@ val GetBusTrips = state(parent = OrderHandling) {
             furhat.say("Nu söker jag bussar")
 
         val order = users.current.order
-        val destination = order.destination ?: "Vasaplan"
-        order.busTripResponses = getSchedule( users.current.order.start ?: "Universum"
-                                            , destination
-                                            , users.current.order.travelDate.format(DateTimeFormatter.ISO_DATE).toString()
-                                            , users.current.order.timeToLeave.format(DateTimeFormatter.ofPattern("HH:mm")).toString()
+        order.busTripResponses = getSchedule( order.start ?: "Universum"
+                                            , order.destination ?: "Vasaplan"
+                                            , order.travelDate.format(DateTimeFormatter.ISO_DATE).toString()
+                                            , order.timeToLeave.format(DateTimeFormatter.ofPattern("HH:mm")).toString()
                                             )
         goto(BusTripInformation)
     }
 }
 
-val BusTripInformation = state {
+val BusTripInformation = state(parent = General) {
     onEntry {
         var order = users.current.order
         if(order.busTripResponses == null)
