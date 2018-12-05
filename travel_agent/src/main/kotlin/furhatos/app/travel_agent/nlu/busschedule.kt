@@ -159,8 +159,10 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
             val timesLine = responseLines[index + 1]
             //println("Timesline")
             //println(timesLine)
+
             var startTime = ""
             var endTime = ""
+            /*
             if(timesLine.contains(";")) {
                 startTime = timesLine
                         .substring(timesLine.indexOf(";")+1)
@@ -175,6 +177,15 @@ fun getSchedule(startPlace: String, destination: String, startDate: String, star
                 endTime = timesLine
                         .substring(timesLine.indexOf("&raquo;")+12)
                         .substring(0, 5)
+            }
+            */
+
+            if (timesLine.contains(";")) {
+                val pattern = "(\\d\\d:\\d\\d)".toRegex()
+                val times = pattern.findAll(timesLine)
+
+                startTime = times.elementAt(0).value
+                endTime   = times.elementAt(1).value
             }
 
             schedule.add(startTime)
