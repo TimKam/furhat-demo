@@ -5,6 +5,7 @@ import furhatos.util.Language
 import furhatos.nlu.*
 import furhatos.nlu.common.*
 import furhatos.nlu.common.Date
+import furhatos.nlu.common.Number
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -55,16 +56,15 @@ open class OrderBusIntent : Intent(), TextGenerator {
     var busTripResponses : Array<String>? = null
     var busFound : Boolean = false
 
-    /* I don't think we need this, every new user gets a new OrderBusIntent anyway
     fun initBusOrder()
     {
-        start = null
-        timeToLeave = null
-        destination = null
+        start            = null
+        timeToLeave      = LocalTime.now()
+        travelDate       = LocalDate.now()
+        destination      = null
         busTripResponses = null
-        busFound = false
+        busFound         = false
     }
-    */
 
     override fun getExamples(lang: Language): List<String> {
         return when (lang)
@@ -165,6 +165,19 @@ class TellTimeIntent(var time : Time? = null) : Intent()
 }
 
 
+class TellAfterHowLongIntent(var inHours : Number? = null, var inMinutes : Number? = null) : Intent()
+{
+    override fun getExamples(lang: Language): List<String> {
+        return when (lang)
+        {
+            Language.SWEDISH -> listOf("Om @inHours timme", "Om @inHours timmar", "Om @inMinutes minuter", "Om @inHours timme och @inMinutes minuter")
+            Language.GERMAN  -> listOf("In @inHours Stunde", "In @inHours Stunden", "In @inMinutes Minuten", "In @inHours Stunden und @inMinutes Minuten")
+            else             -> listOf("In @inHours hour", "In @inHours hours", "In @inMinutes minutes", "In @inHours hours and @inMinutes minutes")
+        }
+    }
+}
+
+
 class TellTimeNowIntent : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return when (lang)
@@ -205,7 +218,7 @@ class ChangeDestinationIntent : Intent()  {
         return when (lang)
         {
             Language.SWEDISH -> listOf("Destination", "Destinationen", "Min destination", "Vart jag vill åka", "slutdestination")
-            Language.GERMAN  -> listOf("Zeil")
+            Language.GERMAN  -> listOf("Ziel")
             else             -> listOf("Destination", "My destination", "End station")
         }
     }
@@ -216,7 +229,7 @@ class ChangeTimeToLeaveIntent : Intent()  {
         return when (lang)
         {
             Language.SWEDISH -> listOf("Avresetid", "tid", "tiden", "starttid")
-            Language.GERMAN  -> listOf("Abfahrt")
+            Language.GERMAN  -> listOf("Abfahrtszeit")
             else             -> listOf("My travel time", "time to travel", "time")
         }
     }

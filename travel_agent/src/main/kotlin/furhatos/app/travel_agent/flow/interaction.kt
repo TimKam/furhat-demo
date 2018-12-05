@@ -1,6 +1,5 @@
 package furhatos.app.travel_agent.flow
 
-
 import furhatos.flow.kotlin.*
 import furhatos.app.travel_agent.nlu.*
 
@@ -90,7 +89,7 @@ val CheckOrder = state {
         when {
             order.start       == null  -> goto(RequestStart)
             order.destination == null  -> goto(RequestDestination)
-            order.timeChecked == false -> goto(ConfirmTime)
+            !order.timeChecked         -> goto(ConfirmTime)
             else -> {
                 if(GlobalLanguage == Language.ENGLISH_US)
                     furhat.say("So you want to go from ${order.start} to ${order.destination} at ${order.timeToLeave}")
@@ -104,10 +103,10 @@ val CheckOrder = state {
                             message += " den ${order.travelDate.dayOfMonth}:e ${order.travelDate.month}"
                     }
 
-                    if (order.updatedDate) {
-                        message += " klockan ${order.timeToLeave.getHour()}"
-                        if (order.timeToLeave.getMinute() > 0)
-                            message += ":${order.timeToLeave.getMinute()}"
+                    if (order.updatedTime) {
+                        message += " klockan ${order.timeToLeave.hour}"
+                        if (order.timeToLeave.minute > 0)
+                            message += ":${order.timeToLeave.minute}"
                         message += "."
                     }
                     print(message)
@@ -188,6 +187,7 @@ val OrderHandling: State = state(parent = General) {
     }
 }
 
+
 val ConfirmTime : State = state(parent = OrderHandling)
 {
     onEntry {
@@ -213,6 +213,15 @@ val ConfirmTime : State = state(parent = OrderHandling)
 
     onResponse<TellTimeIntent> {
         users.current.order.setTime(it.intent.time?.asLocalTime() ?: LocalTime.now())
+        goto(CheckOrder)
+    }
+
+    onResponse<TellAfterHowLongIntent> {
+        val now       = LocalTime.now()
+        val timePoint = LocalTime.of( now.hour   + (it.intent.inHours?.value ?: 0)
+                                    , now.minute + (it.intent.inMinutes?.value ?: 0)
+                                    )
+        users.current.order.setTime(timePoint)
         goto(CheckOrder)
     }
 
@@ -386,16 +395,14 @@ val SearchAgain = state(parent = OrderHandling) {
     }
 
     onResponse<Yes> {
-        //val order = users.current.order
-        //order.initBusOrder()
-
+        val order = users.current.order
+        order.initBusOrder()
         goto(CheckOrder)
     }
 
     onResponse<SvaraJaIntent> {
-        //val order = users.current.order
-        //order.initBusOrder()
-
+        val order = users.current.order
+        order.initBusOrder()
         goto(CheckOrder)
     }
 
@@ -419,7 +426,7 @@ val AbortOrder = state {
             furhat.say("Tråkigt att jag inte kunna hjälpa er")
 
         val order = users.current.order
-        //order.initBusOrder()
+        order.initBusOrder()
         goto(Idle)
     }
 }
@@ -437,7 +444,7 @@ val EndOrder = state {
             val order = users.current.order
             furhat.gesture(Gestures.Blink)
         }
-        //order.initBusOrder()
+        order.initBusOrder()
         goto(Idle)
     }
 }
@@ -463,7 +470,6 @@ val RequestTime : State = state(parent = OrderHandling) {
         goto(CheckOrder)
     }
 
-
     onResponse<TellTimeIntent> {
         users.current.order.setTime(it.intent.time?.asLocalTime() ?: LocalTime.now())
         goto(CheckOrder)
@@ -474,7 +480,17 @@ val RequestTime : State = state(parent = OrderHandling) {
         users.current.order.setTime(it.intent.time?.asLocalTime() ?: LocalTime.now())
         goto(CheckOrder)
     }
+
+    onResponse<TellAfterHowLongIntent> {
+        val now       = LocalTime.now()
+        val timePoint = LocalTime.of( now.hour   + (it.intent.inHours?.value ?: 0)
+                                    , now.minute + (it.intent.inMinutes?.value ?: 0)
+                                    )
+        users.current.order.setTime(timePoint)
+        goto(CheckOrder)
+    }
 }
+
 
 // Request start
 val RequestStart : State = state(parent = OrderHandling) {
