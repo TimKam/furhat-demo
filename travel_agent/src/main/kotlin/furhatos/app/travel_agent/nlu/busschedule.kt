@@ -116,7 +116,7 @@ class Trip(val startTime : LocalTime, val endTime : LocalTime, val duration : In
         if (this.duration == 1)
             description += "en minut. "
         else
-            description += "${this.duration} minuter."
+            description += "${this.duration} minuter. "
 
         // walking and changing snippets
         description += when
