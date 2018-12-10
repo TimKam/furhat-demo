@@ -12,8 +12,11 @@ Note that we ``Gen2 Legacy`` version of the Furhat SDK to be compatible with the
 ## Interacting with the Furhat travel planner
 The following video shows how you can interact with the Furhat travel planner:
 
-**TODO**
+**Available in offline version**
 
+The following state diagram depicts possible interaction flows:
+
+![State diagram](furhat_state_diagram.png)
 
 ## Future work
 So far, we have implemented a simple demo to show-case some capabilities of Furhat.
