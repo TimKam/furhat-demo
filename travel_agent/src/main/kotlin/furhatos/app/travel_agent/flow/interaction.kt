@@ -405,8 +405,23 @@ val BusTripInformation = state(parent = General) {
 
     onResponse<SvaraJaIntent> {
         var order = users.current.order
-        furhat.say(order.busTripResponses!![BusAnswer.LONG.index])
-        delay(500)
+        var rspArray = order.busTripResponses!![BusAnswer.LONG.index].split(".")
+        if(!rspArray.isEmpty()) {
+            rspArray.forEach {
+                furhat.say(it)
+            }
+            furhat.say(order.busTripResponses!![BusAnswer.LONG.index])
+            delay(500)
+        }
+        else
+        {
+            furhat.say(when (GlobalLanguage)
+            {
+                Language.SWEDISH -> "Något gick tyvärr fel"
+                Language.GERMAN  -> "Achtung, achtung..."
+                else             -> "Sorry something went wrong"
+            })
+        }
         goto(SearchAgain)
     }
 
@@ -476,7 +491,7 @@ val EndOrder = state {
             furhat.gesture(Gestures.BigSmile)
             furhat.say(when (GlobalLanguage)
             {
-                Language.SWEDISH -> "Ha en trevlig resa"
+                Language.SWEDISH -> "Då får ni ha en trevlig resa"
                 Language.GERMAN  -> "Gute Reise!"
                 else             -> "Have a nice trip"
             })

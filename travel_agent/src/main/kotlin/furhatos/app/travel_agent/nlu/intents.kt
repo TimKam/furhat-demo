@@ -48,6 +48,11 @@ open class OrderBusIntent : Intent(), TextGenerator {
         this.timeChecked = true
     }
 
+    fun setTimeUnChecked()
+    {
+        this.timeChecked = false
+    }
+
     fun setDest(dest : String)
     {
         this.destination = dest
@@ -64,6 +69,7 @@ open class OrderBusIntent : Intent(), TextGenerator {
         destination      = null
         busTripResponses = null
         busFound         = false
+        setTimeUnChecked()
     }
 
     override fun getExamples(lang: Language): List<String> {

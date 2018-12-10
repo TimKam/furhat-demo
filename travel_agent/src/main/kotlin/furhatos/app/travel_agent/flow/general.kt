@@ -42,6 +42,13 @@ val Interaction: State = state {
                 furhat.glance(it)
             }
         } else {
+            println("hejdå")
+            furhat.say(when (GlobalLanguage)
+            {
+                Language.SWEDISH -> "Hejdå!"
+                Language.GERMAN  -> "Aufwidersehn!"
+                else             -> "Bye!"
+            })
             goto(Idle)
         }
     }
