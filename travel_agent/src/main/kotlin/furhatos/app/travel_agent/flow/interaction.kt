@@ -405,16 +405,9 @@ val BusTripInformation = state(parent = General) {
 
     onResponse<SvaraJaIntent> {
         var order = users.current.order
-        var rspArray = order.busTripResponses!![BusAnswer.LONG.index].split(".")
-        if(!rspArray.isEmpty()) {
-            rspArray.forEach {
-                furhat.say(it)
-            }
+        try {
             furhat.say(order.busTripResponses!![BusAnswer.LONG.index])
-            delay(500)
-        }
-        else
-        {
+        } catch(e: Exception) {
             furhat.say(when (GlobalLanguage)
             {
                 Language.SWEDISH -> "Något gick tyvärr fel"
